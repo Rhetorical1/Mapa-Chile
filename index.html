@@ -48,7 +48,7 @@
         }).addTo(map);
 
         // Colores graduales por región: norte (café), centro (verde medio oscuro), sur (verde más claro)
-        fetch("/static/chile_regiones.geojson")
+        fetch("./static/chile_regiones.geojson")
             .then(res => res.json())
             .then(data => {
                 L.geoJSON(data, {
