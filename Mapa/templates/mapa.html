@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Mapa Didáctico de Chile</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css" />
+    <style>
+        html, body {
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            width: 100vw;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        #map-container {
+            width: 100vw;
+            height: 100vh;
+        }
+        #map {
+            width: 100%;
+            height: 100%;
+        }
+
+    </style>
+</head>
+<body>
+    <div id="map-container">
+        <div id="map"></div>
+    </div>
+
+    <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"></script>
+    <script>
+        const map = L.map('map').setView([-30.0, -70.0], 5);
+
+        // Fondo blanco
+        L.rectangle([[-90, -180], [90, 180]], {
+            color: '#fff',
+            weight: 0,
+            fillColor: '#ffffff',
+            fillOpacity: 1
+        }).addTo(map);
+
+        // Colores graduales por región: norte (café), centro (verde medio oscuro), sur (verde más claro)
+        fetch("/static/chile_regiones.geojson")
+            .then(res => res.json())
+            .then(data => {
+                L.geoJSON(data, {
+                    style: function (feature) {
+                        const region = feature.properties.Region || feature.properties.region || "";
+                        let color;
+                        if (region.includes("Arica")) {
+                            color = "#5A0000"; 
+                        } else if(region.includes("Tarapacá")) {
+                            color = "#7A0A0A"; 
+                        } else if(region.includes("Antofagasta")) {
+                            color = "#9C1E1E"; 
+                        } else if(region.includes("Atacama")) {
+                            color = "#B83232"; 
+                        } else if(region.includes("Coquimbo")) {
+                            color = "#D14848"; 
+                        } else if(region.includes("Valparaíso")) {
+                            color = "#E5675A"; 
+                        } else if(region.includes("Metropolitana de Santiago")) {
+                            color = "#ED8A6A"; 
+                        } else if(region.includes("O'Higgins")) {
+                            color = "#F3A96F"; 
+                        } else if(region.includes("Maule")) {
+                            color = "#F8C97A"; 
+                        } else if(region.includes("Ñuble")) {
+                            color = "#F6DE6F"; 
+                        } else if(region.includes("Bío-Bío")) {
+                            color = "#D6E87B"; 
+                        } else if(region.includes("La Araucanía")) {
+                            color = "#B6EC88";
+                        } else if(region.includes("Los Ríos")) {
+                            color = "#91E899";
+                        } else if(region.includes("Los Lagos")) {
+                            color = "#6FD8A5";
+                        } else if(region.includes("Aysén")) {
+                            color = "#4BCB98";
+                        } else if(region.includes("Región de Magallanes y Antártica Chilena")) {
+                            color = "#00008B";
+                        } else {
+                            color = "#CCCCCC";
+                        }
+                        return {
+                            color: "#444",
+                            weight: 1,
+                            fillColor: color,
+                            fillOpacity: 0.7
+                        };
+                    },
+                    onEachFeature: function (feature, layer) {
+                        const nombre = feature.properties.Region || feature.properties.region || "Región";
+                        const info = feature.properties.Detalle || nombre;
+                        layer.bindPopup(`<strong>${nombre}</strong><br>${info}`);
+                    }
+                }).addTo(map);
+            });
+
+        const regionIcon = L.divIcon({
+            className: 'custom-div-icon',
+            html: '<div style="font-size: 20px; color: red;">📍</div>',
+            iconSize: [30, 42],
+            iconAnchor: [15, 42]
+        });
+                // Información didáctica por región (coordenadas aproximadas para los markers)
+                const infoRegiones = [
+                {
+        nombre: "Región de Arica y Parinacota",
+        coords: [-18.4783, -70.3126],
+        info:`
+        <b>Región de Arica y Parinacota</b><br>
+                    <ul>
+                        <li><strong>División Político Administrativa:</strong> Provincias: Arica y Parinacota. Comunas: Arica, Camarones, Putre, General Lagos.</li>
+                        <li><strong>Economía:</strong> Comercio (Zofri), Agricultura (olivos, tomates), Pesca, Turismo.</li>
+                        <li><strong>Ecosistema:</strong> Desierto costero, Altiplano, Bofedales y lagunas altoandinas.</li>
+                        <li><strong>Relieve:</strong> Planicies litorales, Cordillera de la Costa, Depresión Intermedia, Cordillera de los Andes.</li>
+                    </ul>`
+    },
+    {
+        nombre: "Región de Tarapacá",
+        coords: [-20.2307, -69.755],
+        info:`
+        <b>Región de Tarapacá</b><br>
+                    <ul>
+                        <li><strong>División Político Administrativa:</strong> Provincias: Iquique y Tamarugal  Comunas: Iquique, Alto Hospicio, Pozo Almonte, Huara, Pica, Camiña, Colchane. </li>
+                        <li><strong>Economía:</strong> Minería (cobre, yodo), Comercio (Zona Franca de Iquique), Pesca, Turismo.</li>
+                        <li><strong>Ecosistema:</strong> Desierto costero, Pampa del Tamarugal, Oasis interiores.</li>
+                        <li><strong>Relieve:</strong> Planicies litorales, Cordillera de la Costa (Farellón Costero), Depresión de los Andes (Pampa del Tamarugal), Cordillera de los Andes.</li>
+                    </ul>` 
+    },
+    {
+        nombre: "Región de Antofagasta",
+        coords: [-23.6509, -70.4003],
+        info:`
+        <b>Región de Antofagasta</b><br>
+                    <ul>
+                        <li><strong>División Político Administrativa:</strong> Provincias: Antofagasta, El Loa y Tocopilla Comunas: Antofagasta, Mejillones, Sierra Gorda, Taltal, Calama, Ollagüe, San Pedro de Atacama, Tocopilla, María Elena</li>
+                        <li><strong>Economía:</strong> Minería (cobre, litio, salitre), Industria, Pesca.</li>
+                        <li><strong>Ecosistema:</strong> Desierto de Atacama, Oasis y salares (San Pedro de Atacama, Salar de Atacama), Costa desértica. </li>
+                        <li><strong>Relieve:</strong> Planicies litorales, Cordillera de la Costa, Depresión Intermedia (Pampa del Tamarugal en su extremo norte, y desierto), Cordillera de los Andes (volcanes, salares). </li>
+                    </ul>`
+    },
+    {
+        nombre: "Región de Atacama",
+        coords: [-27.3668, -70.3316],
+        info: `
+        <b>Región de Atacama</b><br>
+                    <ul>
+                        <li><strong>División Político Administrativa:</strong> Provincias: Chañaral, Copiapó y Huasco.  Comunas: Chañaral, Diego de Almagro, Copiapó, Caldera, Tierra Amarilla, Vallenar, Alto del Carmen, Freirina, Huasco. </li>
+                        <li><strong>Economía:</strong> Minería (cobre, oro, hierro), Agricultura (uvas, olivos, frutas), Turismo.</li>
+                        <li><strong>Ecosistema:</strong> Desierto de Atacama, Valles transversales, Florecimiento del desierto.</li>
+                        <li><strong>Relieve:</strong> Planicies litorales, Cordillera de la Costa (fragmentada por los valles transversales), Valles transversales, Cordillera de los Andes (cumbres elevadas, Ojos del Salado).</li>
+                    </ul>
+    <img src="/static/img/atacama_laguna.jpg" alt="Laguna Atacama" width="100" style="margin:2px;">
+    <img src="/static/img/atacama_paisaje.jpg" alt="Paisaje Atacama" width="100" style="margin:2px;">
+    <img src="/static/img/atardecer_luna.jpg" alt="Valle de la Luna" width="100" style="margin:2px;">
+    <img src="/static/img/nevado_atacama.jpg" alt="Nevado Atacama" width="100" style="margin:2px;">
+  `
+    },
+    {
+        nombre: "Región de Coquimbo",
+        coords: [-30.5986, -71.2069],
+        info:`
+        <b>Región de Coquimbo</b><br>
+                    <ul>
+                        <li><strong>División Político Administrativa:</strong> Provincias: Elqui, Limarí y Choapa. Comunas: La Serena, Coquimbo, Andacollo, La Higuera, Paihuano, Vicuña, Ovalle, Combarbalá, Monte Patria, Punitaqui, Río Hurtado, Illapel, Canela, Los Vilos, Salamanca.</li>
+                        <li><strong>Economía:</strong>Minería (cobre, hierro), Agricultura (frutas, vid para pisco, olivos), Pesca y acuicultura, Turismo (astroturismo).</li>
+                        <li><strong>Ecosistema:</strong>: Semiárido, Valles transversales con vegetación xerófita, Estepa.</li>
+                        <li><strong>Relieve:</strong>Planicies litorales, Cordillera de la Costa (fragmentada), Valles transversales (ríos Elqui, Limarí, Choapa), Cordillera de los Andes (más baja y erosionada).</li>
+                    </ul>`
+    },
+    {
+        nombre: "Región de Valparaíso",
+        coords: [-33.0472, -71.6127],
+        info:`
+        <b>Región de Valparaíso</b><br>
+                    <ul>
+                        <li><strong>División Político Administrativa:</strong> Provincias: Valparaíso, Isla de Pascua, Los Andes, Petorca, Quillota, San Antonio, San Felipe de Aconcagua y Marga Marga. Comunas: Valparaíso, Viña del Mar, Concón, Quintero, Puchuncaví, Casablanca, Juan Fernández, Isla de Pascua, Los Andes, Calle Larga, Rinconada, San Esteban, La Ligua, Cabildo, Papudo, Petorca, Quillota, Calera, Hijuelas, La Cruz, Nogales, San Antonio, Cartagena, El Quisco, El Tabo, Santo Domingo, Algarrobo, San Felipe, Catemu, Llay-Llay, Panquehue, Putaendo, Santa María, Quilpué, Villa Alemana, Limache, Olmué. </li>
+                        <li><strong>Economía:</strong> Actividad portuaria (Valparaíso, San Antonio), Turismo, Agricultura (palta, frutas, vino), Industria (refinería).</li>
+                        <li><strong>Ecosistema:</strong> Mediterráneo (predominante), Bosque esclerófilo, Zona costera.</li>
+                        <li><strong>Relieve:</strong> Planicies litorales (estrechas), Cordillera de la Costa (más elevada y compacta que en el norte), Depresión Intermedia (valle del Aconcagua), Cordillera de los Andes (Aconcagua, Portillo).</li>
+                    </ul>`
+    },
+    {
+        nombre: "Región Metropolitana de Santiago",
+        coords: [-33.4489, -70.6693],
+        info:`
+        <b>Región Metropolitana de Santiago</b><br>
+                    <ul>
+                        <li><strong>División Político Administrativa:</strong> Provincias: Santiago, Cordillera, Chacabuco, Maipo, Melipilla y Talagante. Comunas: Santiago, Providencia, Las Condes, Vitacura, Ñuñoa, La Florida, Maipú, Puente Alto, etc. (37 comunas en total). </li>
+                        <li><strong>Economía:</strong> Servicios (financieros, comerciales, turísticos), Industria, Comercio, Agricultura (horticultura, frutales en las zonas rurales).</li>
+                        <li><strong>Ecosistema:</strong> Mediterráneo, Bosque esclerófilo (en las zonas precordilleranas), Área urbana.</li>
+                        <li><strong>Relieve:</strong> Depresión Intermedia (Cuenca de Santiago), Cordón de Chacabuco (norte), Cordillera de la Costa (Cerros de Chena, Angostura de Paine), Cordillera de los Andes (Macizo Andino).</li>
+                    </ul>`
+    },
+    {
+        nombre: "Región de O'Higgins",
+        coords: [-34.1708, -70.7405],
+        info:`
+        <b>Región de O´Higgins</b><br>
+                    <ul>
+                        <li><strong>División Político Administrativa:</strong> Provincias: Cachapoal, Colchagua y Cardenal Caro. Comunas: Rancagua, Machalí, Graneros, San Francisco de Mostazal, etc. (33 comunas en total).</li>
+                        <li><strong>Economía:</strong> Minería (El Teniente, cobre), Agricultura (frutales, vid, arroz), Agroindustria.</li>
+                        <li><strong>Ecosistema:</strong> Mediterráneo, Bosque esclerófilo, Zonas húmedas costeras.</li>
+                        <li><strong>Relieve:</strong> Planicies litorales, Cordillera de la Costa (más baja y suave), Depresión Intermedia (Valle Central, ancho y fértil), Cordillera de los Andes (más baja).</li>
+                    </ul>`
+    },
+    {
+        nombre: "Región del Maule",
+        coords: [-35.4232, -71.6541],
+        info:`
+        <b>Región del Maule</b><br>
+                    <ul>
+                        <li><strong>División Político Administrativa:</strong> Provincias: Curicó, Talca, Linares y Cauquenes. Comunas: Talca, Curicó, Linares, Cauquenes, etc. (30 comunas en total). </li>
+                        <li><strong>Economía:</strong> Agricultura (vid, frutales, cereales, remolacha), Silvicultura, Industri, vitivinícola, Generación de energía (hidroeléctrica).</li>
+                        <li><strong>Ecosistema:</strong> Mediterráneo y Templado, Bosque esclerófilo, Bosque caducifolio.</li>
+                        <li><strong>Relieve:</strong> Planicies litorales, Cordillera de la Costa (más baja y con presencia de la Cordillera de la Costa), Depresión Intermedia (Valle Central, amplio), Cordillera de los Andes (volcanes, lagos).</li>
+                    </ul>`
+    },
+    {
+        nombre: "Región de Ñuble",
+        coords: [-36.605, -71.995],
+        info:`
+        <b>Región de Ñuble</b><br>
+                    <ul>
+                        <li><strong>División Político Administrativa:</strong> Provincias: Diguillín, Punilla e Itata. Comunas: Chillán, San Carlos, Quirihue, Bulnes, Coelemu, El Carmen, Yungay, etc. (21 comunas en total).</li>
+                        <li><strong>Economía:</strong> Agricultura (cereales, frutales, legumbres), Silvicultura, Ganadería, Turismo.</li>
+                        <li><strong>Ecosistema:</strong> Templado cálido con estación seca prolongada, Bosque caducifolio, Zona precordillerana andina.</li>
+                        <li><strong>Relieve:</strong> Planicies litorales, Cordillera de la Costa (más baja), Depresión Intermedia (Valle Central), Cordillera de los Andes (volcanes como Nevados de Chillán).</li>
+                    </ul>`
+    },
+    {
+        nombre: "Región del Biobío",
+        coords: [-37.4703, -72.353],
+        info:`
+        <b>Región del Biobío</b><br>
+                    <ul>
+                        <li><strong>División Político Administrativa:</strong> Provincias: Concepción, Arauco y Biobío. Comunas: Concepción, Talcahuano, Chillán Viejo, Los Ángeles, Lebu, etc. (33 comunas en total).</li>
+                        <li><strong>Economía:</strong> Industria (siderúrgica, petroquímica, celulosa y papel), Silvicultura, Pesca y acuicultura, Agricultura, Servicios.</li>
+                        <li><strong>Ecosistema:</strong> Templado lluvioso, Bosque nativo (roble, raulí, coihue), Plantaciones forestales (pino, eucalipto).</li>
+                        <li><strong>Relieve:</strong> Planicies litorales (más amplias en algunos sectores), Cordillera de la Costa (interrumpida por el río Biobío), Depresión Intermedia (Valle Central), Cordillera de los Andes (volcanes, lagos).</li>
+                    </ul>`
+    },
+    {
+        nombre: "Región de La Araucanía",
+        coords: [-38.7359, -72.5904],
+        info:`
+        <b>Región de La Araucanía</b><br>
+                    <ul>
+                        <li><strong>División Político Administrativa:</strong> Provincias: Cautín y Malleco. Comunas: Temuco, Padre Las Casas, Angol, Villarrica, Pucón, etc. (32 comunas en total).</li>
+                        <li><strong>Economía:</strong> Agricultura (trigo, avena, papas), Silvicultura, Ganadería, Turismo (lagos, volcanes).</li>
+                        <li><strong>Ecosistema:</strong> Templado lluvioso, Bosque nativo (roble, coihue, araucaria), Lagos y volcanes.</li>
+                        <li><strong>Relieve:</strong> Planicies litorales, Cordillera de la Costa (más baja), Depresión Intermedia (Valle Central), Cordillera de los Andes (volcanes como Llaima, Villarrica; numerosos lagos).</li>
+                    </ul>`
+    },
+    {
+        nombre: "Región de Los Ríos",
+        coords: [-39.8146, -72.3152],
+        info:`
+        <b>Región de Los Ríos</b><br>
+                    <ul>
+                        <li><strong>División Político Administrativa:</strong> Provincias: Valdivia y Ranco. Comunas: Valdivia, La Unión, Futrono, Panguipulli, Río Bueno, etc. (12 comunas en total).</li>
+                        <li><strong>Economía:</strong> Silvicultura, Turismo (ecoturismo, lagos), Agricultura (leche, carne), Servicios.</li>
+                        <li><strong>Ecosistema:</strong> Templado lluvioso (clima oceánico), Bosque valdiviano (selva fría), Lagos y ríos.</li>
+                        <li><strong>Relieve:</strong> Planicies litorales, Cordillera de la Costa (Cordillera Pelada), Depresión Intermedia (cubierta por glaciares en el pasado), Cordillera de los Andes (lagos de origen glacial, volcanes).</li>
+                    </ul>`
+    },
+    {
+        nombre: "Región de Los Lagos",
+        coords: [-41.4734, -72.9443],
+        info:`
+        <b>Región de Los Lagos</b><br>
+                    <ul>
+                        <li><strong>División Político Administrativa:</strong> Provincias: Osorno, Llanquihue, Chiloé y Palena. Comunas: Puerto Montt, Osorno, Castro, Ancud, Chaitén, Puerto Varas, etc. (30 comunas en total).</li>
+                        <li><strong>Economía:</strong> Acuicultura (salmón, mejillones), Ganadería (producción de leche y carne), Turismo (lagos, Chiloé), Silvicultura.</li>
+                        <li><strong>Ecosistema:</strong> Templado lluvioso, Bosque siempreverde (alerce, coihue), Lagos y archipiélagos.</li>
+                        <li><strong>Relieve:</strong> Planicies litorales, Cordillera de la Costa (fragmentada, con presencia de la Isla de Chiloé), Depresión Intermedia (relieve de morrenas y cuencas lacustres), Cordillera de los Andes (numerosos lagos de origen glacial, volcanes como Osorno, Calbuco).</li>
+                    </ul>`
+    },
+    {
+        nombre: "Región de Aysén",
+        coords: [-45.5734, -72.0683],
+        info:`
+        <b>Región de Aysén</b><br>
+                    <ul>
+                        <li><strong>División Político Administrativa:</strong> Provincias: Coyhaique, Aysén, General Carrera y Capitán Prat. Comunas: Coyhaique, Puerto Aysén, Chile Chico, Cochrane, etc. (10 comunas en total).</li>
+                        <li><strong>Economía:</strong> Ganadería (ovina, bovina), Pesca, Acuicultura (salmón), Turismo (parques nacionales, glaciares).</li>
+                        <li><strong>Ecosistema:</strong> Templado frío lluvioso, Bosque siempreverde, Estepa patagónica (al este), Campos de Hielo Norte y Sur.</li>
+                        <li><strong>Relieve:</strong> Cordillera de la Costa (reducida a islas y fiordos), Depresión Intermedia (no existe como tal, se reemplaza por la Cordillera Patagónica), Cordillera de los Andes (Andes Patagónicos, con fiordos, canales, glaciares), Planicies orientales (estepa).</li>
+                    </ul>`
+    },
+    {
+        nombre: "Región de Magallanes y la Antártica Chilena",
+        coords: [-53.1638, -70.9171],
+        info:`
+        <b>Región de Magallanes y la Antártica Chilena</b><br>
+                    <ul>
+                        <li><strong>División Político Administrativa:</strong> Provincias: Magallanes, Tierra del Fuego, Última Esperanza y Antártica Chilena. Comunas: Punta Arenas, Puerto Natales, Porvenir, Cabo de Hornos, etc. (11 comunas en total).</li>
+                        <li><strong>Economía:</strong> Petróleo y gas, Ganadería (ovina), Pesca, Turismo (Parque Nacional Torres del Paine, cruceros), Actividad portuaria.</li>
+                        <li><strong>Ecosistema:</strong> Estepa patagónica, Bosque andino patagónico, Tundra (en el extremo sur e islas), Glaciares y campos de hielo.</li>
+                        <li><strong>Relieve:</strong> Cordillera de los Andes (fragmentada, transformándose en islas), Planicies patagónicas (estepa), Archipiélagos y fiordos, Grandes cuerpos de agua (Estrecho de Magallanes, Beagle), Territorio antártico.</li>
+                    </ul>`
+    }
+];
+    
+                // Añadir markers con popup para cada región
+                infoRegiones.forEach(region => {
+                    L.marker(region.coords).addTo(map)
+                        .bindPopup(region.info)
+                        .openPopup();
+                });
+    </script>
+</body>
+</html>
