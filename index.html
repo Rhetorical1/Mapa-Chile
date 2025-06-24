@@ -36,8 +36,8 @@
         const map = L.map('map').setView([-30.0, -70.0], 5);
 
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-}).addTo(map);
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(map);
         
         // Fondo blanco
         L.rectangle([[-90, -180], [90, 180]], {
@@ -48,7 +48,7 @@
         }).addTo(map);
 
         // Colores graduales por región: norte (café), centro (verde medio oscuro), sur (verde más claro)
-        fetch("static/chile_regiones.geojson")
+        fetch("/static/chile_regiones.geojson")
             .then(res => res.json())
             .then(data => {
                 L.geoJSON(data, {
